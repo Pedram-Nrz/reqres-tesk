@@ -75,8 +75,9 @@ export async function createUser(newUser:UserType){
         }
 
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    }catch(e){
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    /* eslint-disable @typescript-eslint/no-unused-vars */ 
+    }catch(e:any){
         return {status:"fail",message:"failed to submit a new user"}
     }
 

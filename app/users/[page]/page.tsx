@@ -1,7 +1,8 @@
+import Image from 'next/image';
 import {getUser} from "@/app/db/datahandler.ts";
 import { redirect } from "next/navigation";
 import ActionButton from "@/app/ui/components/ActionButton.tsx";
-import {logoutAction, redirectAction, CreateUserAction} from "@/app/actions/buttonsActions.ts";
+import {logoutAction, redirectAction} from "@/app/actions/buttonsActions.ts";
 import {createUsers, fetchUsers} from "@/app/db/crud.ts";
 import {UserType, RemoteUser} from "@/app/definition/UserDefinition.ts";
 
@@ -16,7 +17,7 @@ export default async function UsersPage({params}: {params: Promise<{ page: strin
   }
   
   const data = await fetch(`https://reqres.in/api/users?page=${page}`);
-  let users : RemoteUser = await data.json();
+  const users : RemoteUser = await data.json();
   await createUsers(users, Number(page) || 1);
   const fetchedUsers = await fetchUsers(users.per_page, Number(page) || 1 > 1 ? (users.page - 1) * users.per_page: undefined);
   if(fetchedUsers?.count){
@@ -57,7 +58,7 @@ export default async function UsersPage({params}: {params: Promise<{ page: strin
                       <div className="flex flex-col lg:flex-row gap-2 lg:gap-4">
                         <div className="lg:flex-none w-fit flex flex-col gap-2">
                           <div>
-                            <img
+                            <Image
                                 className="object-cover rounded-md bg-white shadow-lg"
                                 src={user?.avatar}
                                 width={60}

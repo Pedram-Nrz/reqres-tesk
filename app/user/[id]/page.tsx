@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import {getUser} from "@/app/db/datahandler.ts";
 import { redirect } from "next/navigation";
 import ActionButton from "@/app/ui/components/ActionButton.tsx";
@@ -15,8 +16,8 @@ export default async function UserDetailsPage({params}: {params: Promise<{ id: s
 
 
   const data = await fetch(`https://reqres.in/api/users/${id}`);
-  let userdetail : RemoteUserDetails = await data.json();
-  let currentUser = await fetchUser({remote_id:userdetail?.data?.id || Number(id) || -1});
+  const userdetail : RemoteUserDetails = await data.json();
+  const currentUser = await fetchUser({remote_id:userdetail?.data?.id || Number(id) || -1});
 
   if(!userdetail || !userdetail.data?.id){
     if(!currentUser.result){
@@ -60,7 +61,7 @@ export default async function UserDetailsPage({params}: {params: Promise<{ id: s
                 <div className="flex flex-col lg:flex-row gap-2 lg:gap-4">
                   <div className="lg:flex-none w-fit flex flex-col gap-2">
                     <div>
-                        <img
+                        <Image
                           className="object-cover rounded-md bg-white shadow-lg"
                           src={fetchedUser?.avatar || ""}
                           width={60}
