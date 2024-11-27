@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import ActionButton from "@/app/ui/components/ActionButton.tsx";
 import {logoutAction, redirectAction,deleteUserAction,updateUserAction} from "@/app/actions/buttonsActions.ts";
 import {RemoteUserDetails} from "@/app/definition/UserDefinition.ts";
+import {fetchUser} from "@/app/db/crud.ts";
 
 export default async function UserDetailsPage({params}: {params: Promise<{ id: string }>}) {
   const id = (await params).id
@@ -12,8 +13,22 @@ export default async function UserDetailsPage({params}: {params: Promise<{ id: s
     redirect("/auth/login");
   }
 
+
   const data = await fetch(`https://reqres.in/api/users/${id}`);
   let userdetail : RemoteUserDetails = await data.json();
+  let currentUser = await fetchUser({remote_id:userdetail?.data?.id || Number(id) || -1});
+
+  if(!userdetail || !userdetail.data?.id){
+    if(!currentUser.result){
+      redirect("/users/1");
+    }
+  }
+   
+  if(!currentUser.result){
+    redirect("/users/1");
+  }
+
+  const fetchedUser = currentUser.result.user;
 
   return (
     <div className="">
@@ -39,27 +54,35 @@ export default async function UserDetailsPage({params}: {params: Promise<{ id: s
           <ul className="divide-y divide-slate-500">
 
             {
-              userdetail && userdetail?.data
+              fetchedUser
               ? 
-              (<li key={userdetail?.data?.id} className="py-4">
+              (<li className="py-4">
                 <div className="flex flex-col lg:flex-row gap-2 lg:gap-4">
-                  <div className="lg:flex-none w-fit">
-                    <img
-                        className="object-cover rounded-md bg-white shadow-lg"
-                        src={userdetail?.data?.avatar}
-                        width={60}
-                        height={60} 
-                        alt="user"
-                    />
+                  <div className="lg:flex-none w-fit flex flex-col gap-2">
+                    <div>
+                        <img
+                          className="object-cover rounded-md bg-white shadow-lg"
+                          src={fetchedUser?.avatar || ""}
+                          width={60}
+                          height={60} 
+                          alt="user"
+                        />
+                    </div>
+                    <div>
+                      <div className={`w-fit px-4 py-0 rounded-md text-xs lg:text-sm text-white ${fetchedUser?.is_naughty ? 'bg-red-600 ' : 'bg-blue-600'}`}>
+                          {fetchedUser?.is_naughty ? 'Naughty' : 'Nice'}
+                      </div>
+                    </div>
+
                   </div>
                   <div className="flex-1 flex flex-col gap-2">
                     <div>
-                      <div>{userdetail?.data?.first_name} {userdetail?.data?.last_name}</div>
-                      <div>{userdetail?.data?.email}</div>
+                      <div>{fetchedUser?.first_name} {userdetail?.data?.last_name}</div>
+                      <div>{fetchedUser?.email}</div>
                     </div>
                     <div className="flex flex-row gap-4">
-                      <div className="w-fit"><ActionButton name="Update" action={updateUserAction.bind(null,userdetail?.data?.id)}/></div>
-                      <div className="w-fit"><ActionButton name="Delete" action={deleteUserAction.bind(null,userdetail?.data?.id)}/></div>
+                      <div className="w-fit"><ActionButton name={`Change to ${fetchedUser?.is_naughty ? 'Nice' : 'Naughty'}`} action={updateUserAction.bind(null,fetchedUser?.remote_id, !fetchedUser?.is_naughty)}/></div>
+                      <div className="w-fit"><ActionButton name="Delete" action={deleteUserAction.bind(null,fetchedUser?.remote_id)}/></div>
                     </div>
                   </div>
   

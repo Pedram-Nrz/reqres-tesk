@@ -56,15 +56,15 @@ export type RemoteUser =  {
   }
 
 export type UserType = {
-    id:number,
+    id?:number,
     remote_id:number,
     first_name:string,
     last_name:string,
     email:string,
     avatar:string,
-    is_naughty:boolean,
-    created_at:Date,
-    updated_at:Date
+    is_naughty?:boolean,
+    created_at?:Date,
+    updated_at?:Date
 } 
 
 
@@ -72,10 +72,12 @@ export const UserFomeSchema = z.object({
     firstname:z.string().trim().min(1,{message:"please fill in the first name input"}).toLowerCase(),
     lastname:z.string().trim().min(1,{message:"please fill in the last name input"}),
     email:z.string().trim().email({message:"please enter a valid email address"}).toLowerCase(),
-    isnaughty:z.boolean()
+    isnaughty:z.enum(['nice','naughty'],{message:"There is no other way :)"})
 });
 
  
+export type NewUserFormActionType = (prevState: UserFormState, formData: FormData) => Promise<UserFormState>   
+
 export type UserFormState = 
     |
         {

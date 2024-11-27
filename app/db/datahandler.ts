@@ -17,14 +17,9 @@ export async function onlyLoggedouts(){
     return;
 }
 
-
- 
-
 export const checkSession = cache(async () => {
     const cookie = await cookies();
-    const session = cookie.get("session")?.value;
-
-    
+    const session = cookie.get("session")?.value;   
 
     if(session){
         const verifiedSession = await verifySession(session);
